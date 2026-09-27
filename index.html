@@ -347,6 +347,56 @@ footer{margin-top:8px}
   background:var(--pink);
   color:#fff;
 }
+/* =========================
+   LOGBOOK MENU
+========================= */
+.logbook-menu{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:9998;
+}
+
+.logbook-menu.open{
+  display:flex;
+}
+
+.logbook-box{
+  width:min(420px,100%);
+  background:#fff;
+  border-radius:20px;
+  padding:28px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.20);
+}
+
+.logbook-box h3{
+  margin:0 0 8px;
+}
+
+.logbook-box p{
+  margin:0 0 20px;
+  color:#64748b;
+}
+
+.logbook-box button{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:12px 16px;
+  margin-top:10px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.logbook-box button:last-child{
+  background:#e2e8f0;
+  color:#334155;
+}
 </style>
 </head>
 <body>
@@ -416,9 +466,9 @@ footer{margin-top:8px}
 
     <div class="menu-grid" id="menuGrid">
       <article class="card pink searchable"
-  data-title="Hand Over"
+data-title="Timbang Terima"
   onclick="openHandoverAuth()">
-        <div class="card-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 7c5 0 8 3 8 8s-3 8-8 8-8-3-8-8 3-8 8-8Z"/><path d="M12 42c1-8 5-13 12-13s11 5 12 13"/><path d="M28 28c3 0 6-2 8-5 1 6 0 10-4 13"/></svg></div><div><h3>Hand Over</h3>
+        <div class="card-icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 7c5 0 8 3 8 8s-3 8-8 8-8-3-8-8 3-8 8-8Z"/><path d="M12 42c1-8 5-13 12-13s11 5 12 13"/><path d="M28 28c3 0 6-2 8-5 1 6 0 10-4 13"/></svg></div><div><h3>Timbang Terima</h3>
 <p>Serah terima dan informasi penting pasien</p></div><div class="arrow">›</div>
       </article>
       <article class="card orange searchable" data-title="Dashboard Bed" onclick="showModal('Dashboard Bed','Pantau ketersediaan bed, BOR, kondisi ruangan, dan informasi kapasitas secara terintegrasi.')">
@@ -539,6 +589,45 @@ footer{margin-top:8px}
     </button>
   </div>
 </div>
+<!-- LOGBOOK PASSWORD -->
+<div class="handover-auth" id="logbookAuth">
+  <div class="handover-box">
+
+    <div style="font-size:38px;margin-bottom:10px;">🔐</div>
+
+    <h3>Akses Logbook</h3>
+
+    <p>
+      Masukkan password pegawai untuk melanjutkan ke Logbook.
+    </p>
+
+    <input
+      id="logbookPassword"
+      class="handover-password"
+      type="password"
+      placeholder="Masukkan password"
+      autocomplete="off"
+      onkeydown="if(event.key==='Enter') checkLogbookPassword()"
+    >
+
+    <div id="logbookError" class="handover-error"></div>
+
+    <div class="handover-actions">
+      <button
+        class="handover-cancel"
+        onclick="closeLogbookPassword()">
+        Batal
+      </button>
+
+      <button
+        class="handover-submit"
+        onclick="checkLogbookPassword()">
+        Masuk
+      </button>
+    </div>
+
+  </div>
+</div>
 <script>
 function showModal(title, body){
   document.getElementById('modalTitle').textContent=title;
@@ -548,13 +637,12 @@ function showModal(title, body){
 function closeModal(){document.getElementById('modal').classList.remove('open')}
 function demoLink(name){showModal(name,'Tautan <b>'+name+'</b> masih berupa placeholder. Silakan ganti atribut <code>href</code> dengan alamat aplikasi/Google Workspace yang digunakan oleh unit.')}
 function searchMenu(){
-  const q=document.getElementById('heroSearch').value.trim().toLowerCase();
+  const q=document.getElementById('topSearch').value.trim().toLowerCase();
   const cards=[...document.querySelectorAll('.searchable')];
   cards.forEach(c=>c.style.display=(!q || c.dataset.title.toLowerCase().includes(q))?'flex':'none');
   if(q) document.getElementById('menu').scrollIntoView({behavior:'smooth'});
 }
 document.getElementById('topSearch').addEventListener('input',e=>{
-  document.getElementById('heroSearch').value=e.target.value;
   searchMenu();
 });
 function toggleMobileNav(){
@@ -574,6 +662,49 @@ function openLogbookMenu(){
 }
 function closeLogbookMenu(){
   document.getElementById('logbookMenu').classList.remove('open');
+}
+/* =========================
+   HAND OVER AUTH
+========================= */
+
+function openHandoverAuth(){
+  const modal = document.getElementById('handoverAuth');
+
+  if(!modal) return;
+
+  modal.classList.add('open');
+
+  document.getElementById('handoverPassword').value = '';
+  document.getElementById('handoverError').textContent = '';
+
+  setTimeout(() => {
+    document.getElementById('handoverPassword').focus();
+  }, 100);
+}
+
+function closeHandoverAuth(){
+  const modal = document.getElementById('handoverAuth');
+
+  if(!modal) return;
+
+  modal.classList.remove('open');
+}
+
+function checkHandoverPassword(){
+
+  const password =
+    document.getElementById('handoverPassword').value;
+
+  if(password !== 'Pegawai_2026'){
+
+    document.getElementById('handoverError').textContent =
+      'Password salah. Silakan coba lagi.';
+
+    return;
+  }
+
+  window.location.href =
+    'https://drive.google.com/drive/u/7/folders/1gQCXczEjIB9fD03CW0PcPhuslHgQLyDi';
 }
 let selectedLogbook = '';
 function openLogbookPassword(type){
@@ -645,11 +776,11 @@ document.addEventListener('keydown', function(e){
 
     <div style="font-size:38px;margin-bottom:10px;">🔐</div>
 
-    <h3>Akses Hand Over</h3>
+    <h3>Akses Timbang Terima</h3>
 
     <p>
-      Masukkan password pegawai untuk melanjutkan
-      ke halaman Hand Over.
+Masukkan password pegawai untuk melanjutkan
+ke halaman Timbang Terima.
     </p>
 
     <input
